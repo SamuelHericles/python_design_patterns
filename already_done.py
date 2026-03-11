@@ -168,3 +168,121 @@ def abstract_factory_demo():
 
 
 abstract_factory_demo()
+
+
+# =============================================================================
+# BUILDER
+# =============================================================================
+#
+# builder/
+# ├── builder.py          # Interface do builder
+# ├── concrete_builder.py # Builder concreto
+# ├── director.py         # Diretor
+# ├── product.py          # Produto
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- builder/product.py
+class Pizza:
+    def __init__(self):
+        self.size = None
+        self.crust = None
+        self.sauce = None
+        self.toppings = []
+
+    def __str__(self):
+        return (
+            f"Pizza({self.size}, crust={self.crust}, "
+            f"sauce={self.sauce}, toppings={self.toppings})"
+        )
+
+
+# ---- builder/builder.py
+class PizzaBuilder(ABC):
+    @abstractmethod
+    def set_size(self, size: str):
+        pass
+
+    @abstractmethod
+    def set_crust(self, crust: str):
+        pass
+
+    @abstractmethod
+    def set_sauce(self, sauce: str):
+        pass
+
+    @abstractmethod
+    def add_topping(self, topping: str):
+        pass
+
+    @abstractmethod
+    def build(self) -> Pizza:
+        pass
+
+
+# ---- builder/concrete_builder.py
+class ConcretePizzaBuilder(PizzaBuilder):
+    def __init__(self):
+        self._pizza = Pizza()
+
+    def set_size(self, size: str):
+        self._pizza.size = size
+        return self
+
+    def set_crust(self, crust: str):
+        self._pizza.crust = crust
+        return self
+
+    def set_sauce(self, sauce: str):
+        self._pizza.sauce = sauce
+        return self
+
+    def add_topping(self, topping: str):
+        self._pizza.toppings.append(topping)
+        return self
+
+    def build(self) -> Pizza:
+        pizza = self._pizza
+        self._pizza = Pizza()
+        return pizza
+
+
+# ---- builder/director.py
+class PizzaDirector:
+    def __init__(self, builder: PizzaBuilder):
+        self._builder = builder
+
+    def make_margherita(self) -> Pizza:
+        return (
+            self._builder.set_size("medium")
+            .set_crust("thin")
+            .set_sauce("tomato")
+            .add_topping("mozzarella")
+            .add_topping("basil")
+            .build()
+        )
+
+    def make_pepperoni(self) -> Pizza:
+        return (
+            self._builder.set_size("large")
+            .set_crust("thick")
+            .set_sauce("tomato")
+            .add_topping("pepperoni")
+            .add_topping("cheese")
+            .build()
+        )
+
+
+# ---- builder/main.py
+def builder_demo():
+    print("=== BUILDER ===")
+    builder = ConcretePizzaBuilder()
+    director = PizzaDirector(builder)
+    print(director.make_margherita())
+    print(director.make_pepperoni())
+    print()
+
+
+builder_demo()
