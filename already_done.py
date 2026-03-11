@@ -1,4 +1,67 @@
 # =============================================================================
+# ================== PADRÕES ESTRUTURAIS (STRUCTURAL) ========================
+# =============================================================================
+
+
+# =============================================================================
+# ADAPTER
+# =============================================================================
+#
+# adapter/
+# ├── target.py           # Interface esperada pelo cliente
+# ├── adaptee.py          # Classe incompatível existente
+# ├── adapter.py          # Adaptador
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- adapter/target.py
+class JSONDataProcessor:
+    def process(self, data: dict) -> str:
+        return f"JSON processado: {data}"
+
+
+# ---- adapter/adaptee.py
+class XMLDataProcessor:
+    def process_xml(self, xml_string: str) -> str:
+        return f"XML processado: {xml_string}"
+
+
+# ---- adapter/adapter.py
+import json
+
+
+class XMLToJSONAdapter(JSONDataProcessor):
+    def __init__(self, xml_processor: XMLDataProcessor):
+        self._xml_processor = xml_processor
+
+    def process(self, data: dict) -> str:
+        xml_string = self._dict_to_xml(data)
+        return self._xml_processor.process_xml(xml_string)
+
+    def _dict_to_xml(self, data: dict) -> str:
+        items = "".join(f"<{k}>{v}</{k}>" for k, v in data.items())
+        return f"<root>{items}</root>"
+
+
+# ---- adapter/main.py
+def adapter_demo():
+    print("=== ADAPTER ===")
+    data = {"name": "Alice", "age": 30}
+    json_proc = JSONDataProcessor()
+    xml_proc = XMLDataProcessor()
+    adapter = XMLToJSONAdapter(xml_proc)
+
+    print(f"  {json_proc.process(data)}")
+    print(f"  {adapter.process(data)}")
+    print()
+
+
+adapter_demo()
+
+
+# =============================================================================
 # ==================== PADRÕES CRIACIONAIS (CREATIONAL) =======================
 # =============================================================================
 
