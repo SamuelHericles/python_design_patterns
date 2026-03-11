@@ -2,6 +2,91 @@
 # ================== PADRÕES ESTRUTURAIS (STRUCTURAL) ========================
 # =============================================================================
 
+# =============================================================================
+# BRIDGE
+# =============================================================================
+#
+# bridge/
+# ├── implementation.py     # Interface de implementação
+# ├── concrete_impl.py      # Implementações concretas
+# ├── abstraction.py        # Abstração
+# ├── refined_abstraction.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- bridge/implementation.py
+class Renderer(ABC):
+    @abstractmethod
+    def render_circle(self, x, y, radius) -> str:
+        pass
+
+    @abstractmethod
+    def render_square(self, x, y, side) -> str:
+        pass
+
+
+# ---- bridge/concrete_impl.py
+class VectorRenderer(Renderer):
+    def render_circle(self, x, y, radius) -> str:
+        return f"Círculo vetorial em ({x},{y}) r={radius}"
+
+    def render_square(self, x, y, side) -> str:
+        return f"Quadrado vetorial em ({x},{y}) l={side}"
+
+
+class RasterRenderer(Renderer):
+    def render_circle(self, x, y, radius) -> str:
+        return f"Círculo raster em ({x},{y}) r={radius}"
+
+    def render_square(self, x, y, side) -> str:
+        return f"Quadrado raster em ({x},{y}) l={side}"
+
+
+# ---- bridge/abstraction.py
+class Shape(ABC):
+    def __init__(self, renderer: Renderer):
+        self._renderer = renderer
+
+    @abstractmethod
+    def draw(self) -> str:
+        pass
+
+
+# ---- bridge/refined_abstraction.py
+class Circle(Shape):
+    def __init__(self, renderer, x, y, radius):
+        super().__init__(renderer)
+        self.x, self.y, self.radius = x, y, radius
+
+    def draw(self) -> str:
+        return self._renderer.render_circle(self.x, self.y, self.radius)
+
+
+class Square(Shape):
+    def __init__(self, renderer, x, y, side):
+        super().__init__(renderer)
+        self.x, self.y, self.side = x, y, side
+
+    def draw(self) -> str:
+        return self._renderer.render_square(self.x, self.y, self.side)
+
+
+# ---- bridge/main.py
+def bridge_demo():
+    print("=== BRIDGE ===")
+    shapes = [
+        Circle(VectorRenderer(), 0, 0, 5),
+        Circle(RasterRenderer(), 1, 2, 3),
+        Square(VectorRenderer(), 4, 4, 10),
+    ]
+    for shape in shapes:
+        print(f"  {shape.draw()}")
+    print()
+
+
+bridge_demo()
 
 # =============================================================================
 # ADAPTER
