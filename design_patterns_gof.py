@@ -5,57 +5,6 @@ from abc import ABC, abstractmethod
 
 
 # =============================================================================
-# PROTOTYPE
-# =============================================================================
-#
-# prototype/
-# ├── prototype.py         # Interface Prototype
-# ├── concrete_prototype.py
-# └── main.py
-#
-# =============================================================================
-
-import copy
-
-
-# ---- prototype/prototype.py
-class Prototype(ABC):
-    @abstractmethod
-    def clone(self):
-        pass
-
-
-# ---- prototype/concrete_prototype.py
-class Document(Prototype):
-    def __init__(self, title: str, content: str, tags: list):
-        self.title = title
-        self.content = content
-        self.tags = tags
-
-    def clone(self):
-        return copy.deepcopy(self)
-
-    def __str__(self):
-        return f"Document(title={self.title}, tags={self.tags})"
-
-
-# ---- prototype/main.py
-def prototype_demo():
-    print("=== PROTOTYPE ===")
-    original = Document("Relatório Q1", "Conteúdo original", ["financeiro", "2024"])
-    clone1 = original.clone()
-    clone1.title = "Relatório Q2"
-    clone1.tags.append("revisado")
-
-    print(f"Original: {original}")
-    print(f"Clone:    {clone1}")
-    print()
-
-
-prototype_demo()
-
-
-# =============================================================================
 # SINGLETON
 # =============================================================================
 #

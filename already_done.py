@@ -3,6 +3,104 @@
 # =============================================================================
 
 # =============================================================================
+# SINGLETON
+# =============================================================================
+#
+# singleton/
+# ├── singleton.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- singleton/singleton.py
+class DatabaseConnection:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._connected = False
+            cls._instance._url = None
+        return cls._instance
+
+    def connect(self, url: str):
+        if not self._connected:
+            self._url = url
+            self._connected = True
+            print(f"  Conectado a: {url}")
+        else:
+            print(f"  Já conectado a: {self._url}")
+
+    def query(self, sql: str) -> str:
+        return f"  Resultado de: {sql}"
+
+
+# ---- singleton/main.py
+def singleton_demo():
+    print("=== SINGLETON ===")
+    db1 = DatabaseConnection()
+    db2 = DatabaseConnection()
+    db1.connect("postgresql://localhost:5432/mydb")
+    db2.connect("mysql://localhost:3306/otherdb")  # será ignorado
+    print(f"  db1 is db2: {db1 is db2}")
+    print(db1.query("SELECT * FROM users"))
+    print()
+
+
+singleton_demo()
+
+# =============================================================================
+# PROTOTYPE
+# =============================================================================
+#
+# prototype/
+# ├── prototype.py         # Interface Prototype
+# ├── concrete_prototype.py
+# └── main.py
+#
+# =============================================================================
+
+import copy
+
+
+# ---- prototype/prototype.py
+class Prototype(ABC):
+    @abstractmethod
+    def clone(self):
+        pass
+
+
+# ---- prototype/concrete_prototype.py
+class Document(Prototype):
+    def __init__(self, title: str, content: str, tags: list):
+        self.title = title
+        self.content = content
+        self.tags = tags
+
+    def clone(self):
+        return copy.deepcopy(self)
+
+    def __str__(self):
+        return f"Document(title={self.title}, tags={self.tags})"
+
+
+# ---- prototype/main.py
+def prototype_demo():
+    print("=== PROTOTYPE ===")
+    original = Document("Relatório Q1", "Conteúdo original", ["financeiro", "2024"])
+    clone1 = original.clone()
+    clone1.title = "Relatório Q2"
+    clone1.tags.append("revisado")
+
+    print(f"Original: {original}")
+    print(f"Clone:    {clone1}")
+    print()
+
+
+prototype_demo()
+
+# =============================================================================
 # FACTORY METHOD
 # =============================================================================
 #
