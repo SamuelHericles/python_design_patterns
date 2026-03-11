@@ -1,4 +1,4 @@
-from creational.factory_method.product import Notification
+from product import Notification
 
 
 class EmailNotification(Notification):

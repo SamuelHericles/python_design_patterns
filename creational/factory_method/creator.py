@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from creational.factory_method.product import Notification
+from product import Notification
 
 
 # ABC -> needed to create a abstract class and methods - just rules names

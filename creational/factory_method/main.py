@@ -1,4 +1,4 @@
-from creational.factory_method.concrete_creator import (
+from concrete_creator import (
     EmailCreator,
     SMSCreator,
     PushCreator,
@@ -13,4 +13,5 @@ def factory_method_demo():
     print()
 
 
-factory_method_demo()
+if __name__ == "__main__":
+    factory_method_demo()

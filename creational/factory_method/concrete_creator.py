@@ -1,6 +1,6 @@
-from creational.factory_method.product import Notification
-from creational.factory_method.creator import NotificationCreator
-from creational.factory_method.concrete_product import (
+from product import Notification
+from creator import NotificationCreator
+from concrete_product import (
     EmailNotification,
     SMSNotification,
     PushNotification,
