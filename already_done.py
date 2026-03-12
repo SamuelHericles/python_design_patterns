@@ -2,6 +2,150 @@
 # ================== PADRÕES ESTRUTURAIS (STRUCTURAL) ========================
 # =============================================================================
 
+# =============================================================================
+# FACADE
+# =============================================================================
+#
+# facade/
+# ├── subsystems/
+# │   ├── cpu.py
+# │   ├── memory.py
+# │   ├── hard_drive.py
+# │   └── bios.py
+# ├── facade.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- facade/subsystems/cpu.py
+class CPU:
+    def freeze(self):
+        return "  CPU: freeze"
+
+    def jump(self, address):
+        return f"  CPU: jump to {address}"
+
+    def execute(self):
+        return "  CPU: execute"
+
+
+# ---- facade/subsystems/memory.py
+class Memory:
+    def load(self, position, data):
+        return f"  Memory: load {data} at {position}"
+
+
+# ---- facade/subsystems/hard_drive.py
+class HardDrive:
+    def read(self, lba, size):
+        return f"  HDD: read {size} bytes from sector {lba}"
+
+
+# ---- facade/subsystems/bios.py
+class BIOS:
+    BOOT_ADDRESS = "0x00"
+    BOOT_SECTOR = 0
+    SECTOR_SIZE = 512
+
+
+# ---- facade/facade.py
+class Computer:
+    def __init__(self):
+        self._cpu = CPU()
+        self._memory = Memory()
+        self._hdd = HardDrive()
+
+    def start(self):
+        steps = []
+        steps.append(self._cpu.freeze())
+        steps.append(
+            self._memory.load(
+                BIOS.BOOT_ADDRESS, self._hdd.read(BIOS.BOOT_SECTOR, BIOS.SECTOR_SIZE)
+            )
+        )
+        steps.append(self._cpu.jump(BIOS.BOOT_ADDRESS))
+        steps.append(self._cpu.execute())
+        return "\n".join(steps)
+
+
+# ---- facade/main.py
+def facade_demo():
+    print("=== FACADE ===")
+    computer = Computer()
+    print(computer.start())
+    print()
+
+
+facade_demo()
+
+# =============================================================================
+# DECORATOR
+# =============================================================================
+#
+# decorator/
+# ├── component.py
+# ├── concrete_component.py
+# ├── decorator.py
+# ├── concrete_decorators.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- decorator/component.py
+class TextFormatter(ABC):
+    @abstractmethod
+    def format(self, text: str) -> str:
+        pass
+
+
+# ---- decorator/concrete_component.py
+class PlainText(TextFormatter):
+    def format(self, text: str) -> str:
+        return text
+
+
+# ---- decorator/decorator.py
+class TextDecorator(TextFormatter):
+    def __init__(self, wrapped: TextFormatter):
+        self._wrapped = wrapped
+
+    def format(self, text: str) -> str:
+        return self._wrapped.format(text)
+
+
+# ---- decorator/concrete_decorators.py
+class BoldDecorator(TextDecorator):
+    def format(self, text: str) -> str:
+        return f"**{self._wrapped.format(text)}**"
+
+
+class ItalicDecorator(TextDecorator):
+    def format(self, text: str) -> str:
+        return f"_{self._wrapped.format(text)}_"
+
+
+class UpperCaseDecorator(TextDecorator):
+    def format(self, text: str) -> str:
+        return self._wrapped.format(text).upper()
+
+
+# ---- decorator/main.py
+def decorator_demo():
+    print("=== DECORATOR ===")
+    text = PlainText()
+    bold_italic = ItalicDecorator(BoldDecorator(text))
+    upper_bold = UpperCaseDecorator(BoldDecorator(text))
+
+    print(f"  Plain:       {text.format('hello world')}")
+    print(f"  Bold+Italic: {bold_italic.format('hello world')}")
+    print(f"  Upper+Bold:  {upper_bold.format('hello world')}")
+    print()
+
+
+decorator_demo()
+
 
 # =============================================================================
 # COMPOSITE
