@@ -1,91 +1,4 @@
 # =============================================================================
-# ITERATOR
-# =============================================================================
-#
-# iterator/
-# ├── iterator.py
-# ├── concrete_iterator.py
-# ├── collection.py
-# └── main.py
-#
-# =============================================================================
-
-from typing import Iterator as TypingIterator, Generic, TypeVar
-
-T = TypeVar("T")
-
-
-# ---- iterator/iterator.py
-class TreeNode:
-    def __init__(self, value):
-        self.value = value
-        self.left = None
-        self.right = None
-
-
-# ---- iterator/concrete_iterator.py
-class InOrderIterator:
-    def __init__(self, root: TreeNode):
-        self._stack = []
-        self._push_left(root)
-
-    def _push_left(self, node):
-        while node:
-            self._stack.append(node)
-            node = node.left
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if not self._stack:
-            raise StopIteration
-        node = self._stack.pop()
-        self._push_left(node.right)
-        return node.value
-
-
-# ---- iterator/collection.py
-class BinaryTree:
-    def __init__(self):
-        self.root = None
-
-    def insert(self, value):
-        if not self.root:
-            self.root = TreeNode(value)
-        else:
-            self._insert(self.root, value)
-
-    def _insert(self, node, value):
-        if value < node.value:
-            if node.left is None:
-                node.left = TreeNode(value)
-            else:
-                self._insert(node.left, value)
-        else:
-            if node.right is None:
-                node.right = TreeNode(value)
-            else:
-                self._insert(node.right, value)
-
-    def __iter__(self):
-        return InOrderIterator(self.root)
-
-
-# ---- iterator/main.py
-def iterator_demo():
-    print("=== ITERATOR ===")
-    tree = BinaryTree()
-    for val in [5, 3, 7, 1, 4, 6, 8]:
-        tree.insert(val)
-    print(f"  In-order: {list(tree)}")
-    print()
-
-
-iterator_demo()
-
-
-# =============================================================================
 # MEDIATOR
 # =============================================================================
 #
@@ -96,6 +9,10 @@ iterator_demo()
 # └── main.py
 #
 # =============================================================================
+
+from typing import Iterator as TypingIterator, Generic, TypeVar
+
+T = TypeVar("T")
 
 
 # ---- mediator/mediator.py

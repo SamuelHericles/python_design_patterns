@@ -1,7 +1,6 @@
 # COMMAND
 
-Comand ou composite, objetos em árvore para representar hierarquia e composição uniforme.
-
+Encapsula requisição como objeto. Permite parametrizar, enfilerar,logar e desfazer.
 
 ```
 command/
