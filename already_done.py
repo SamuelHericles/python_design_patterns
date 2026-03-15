@@ -3,6 +3,107 @@
 # =============================================================================
 from abc import ABC, abstractmethod
 
+# =============================================================================
+# COMMAND
+# =============================================================================
+#
+# command/
+# ├── command.py
+# ├── concrete_commands.py
+# ├── receiver.py
+# ├── invoker.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- command/receiver.py
+class TextEditor:
+    def __init__(self):
+        self._text = ""
+
+    def write(self, text: str):
+        self._text += text
+        print(f"  Editor: escreveu '{text}'")
+
+    def delete(self, count: int):
+        removed = self._text[-count:]
+        self._text = self._text[:-count]
+        print(f"  Editor: deletou '{removed}'")
+        return removed
+
+    @property
+    def text(self):
+        return self._text
+
+
+# ---- command/command.py
+class Command(ABC):
+    @abstractmethod
+    def execute(self):
+        pass
+
+    @abstractmethod
+    def undo(self):
+        pass
+
+
+# ---- command/concrete_commands.py
+class WriteCommand(Command):
+    def __init__(self, editor: TextEditor, text: str):
+        self._editor = editor
+        self._text = text
+
+    def execute(self):
+        self._editor.write(self._text)
+
+    def undo(self):
+        self._editor.delete(len(self._text))
+
+
+class DeleteCommand(Command):
+    def __init__(self, editor: TextEditor, count: int):
+        self._editor = editor
+        self._count = count
+        self._deleted = ""
+
+    def execute(self):
+        self._deleted = self._editor.text[-self._count :]
+        self._editor.delete(self._count)
+
+    def undo(self):
+        self._editor.write(self._deleted)
+
+
+# ---- command/invoker.py
+class CommandHistory:
+    def __init__(self):
+        self._history = []
+
+    def execute(self, command: Command):
+        command.execute()
+        self._history.append(command)
+
+    def undo(self):
+        if self._history:
+            self._history.pop().undo()
+
+
+# ---- command/main.py
+def command_demo():
+    print("=== COMMAND ===")
+    editor = TextEditor()
+    history = CommandHistory()
+
+    history.execute(WriteCommand(editor, "Olá "))
+    history.execute(WriteCommand(editor, "mundo!"))
+    print(f"  Texto: '{editor.text}'")
+    history.undo()
+    print(f"  Após undo: '{editor.text}'")
+    print()
+
+
+command_demo()
 
 # =============================================================================
 # ================= PADRÕES COMPORTAMENTAIS (BEHAVIORAL) =====================
