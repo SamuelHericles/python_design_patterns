@@ -4,6 +4,160 @@
 from abc import ABC, abstractmethod
 
 # =============================================================================
+# STATE
+# =============================================================================
+#
+# state/
+# ├── state.py
+# ├── concrete_states.py
+# ├── context.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- state/state.py
+class TrafficLightState(ABC):
+    @abstractmethod
+    def handle(self, context: "TrafficLight") -> str:
+        pass
+
+    @abstractmethod
+    def color(self) -> str:
+        pass
+
+
+# ---- state/concrete_states.py
+class GreenState(TrafficLightState):
+    def color(self) -> str:
+        return "VERDE"
+
+    def handle(self, context: "TrafficLight") -> str:
+        context.state = YellowState()
+        return "  🟢 Verde - Pode passar. Próximo: Amarelo"
+
+
+class YellowState(TrafficLightState):
+    def color(self) -> str:
+        return "AMARELO"
+
+    def handle(self, context: "TrafficLight") -> str:
+        context.state = RedState()
+        return "  🟡 Amarelo - Atenção. Próximo: Vermelho"
+
+
+class RedState(TrafficLightState):
+    def color(self) -> str:
+        return "VERMELHO"
+
+    def handle(self, context: "TrafficLight") -> str:
+        context.state = GreenState()
+        return "  🔴 Vermelho - Pare. Próximo: Verde"
+
+
+# ---- state/context.py
+class TrafficLight:
+    def __init__(self):
+        self.state: TrafficLightState = GreenState()
+
+    def change(self) -> str:
+        return self.state.handle(self)
+
+
+# ---- state/main.py
+def state_demo():
+    print("=== STATE ===")
+    light = TrafficLight()
+    for _ in range(4):
+        print(light.change())
+    print()
+
+
+state_demo()
+
+
+# =============================================================================
+# OBSERVER
+# =============================================================================
+#
+# observer/
+# ├── observer.py
+# ├── subject.py
+# ├── concrete_observers.py
+# └── main.py
+#
+# =============================================================================
+
+
+# ---- observer/observer.py
+class Observer(ABC):
+    @abstractmethod
+    def update(self, event: str, data):
+        pass
+
+
+# ---- observer/subject.py (EventBus/Observable)
+class Stock:
+    def __init__(self, symbol: str, price: float):
+        self._symbol = symbol
+        self._price = price
+        self._observers: List[Observer] = []
+
+    def attach(self, observer: Observer):
+        self._observers.append(observer)
+
+    def detach(self, observer: Observer):
+        self._observers.remove(observer)
+
+    def _notify(self, event: str):
+        for obs in self._observers:
+            obs.update(event, {"symbol": self._symbol, "price": self._price})
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, value: float):
+        old = self._price
+        self._price = value
+        direction = "↑" if value > old else "↓"
+        self._notify(f"price_change {direction}")
+
+
+# ---- observer/concrete_observers.py
+class AlertObserver(Observer):
+    def __init__(self, name: str, threshold: float):
+        self.name = name
+        self.threshold = threshold
+
+    def update(self, event: str, data):
+        if data["price"] > self.threshold:
+            print(
+                f"  🚨 {self.name}: {data['symbol']} = R${data['price']:.2f} ({event})"
+            )
+
+
+class LogObserver(Observer):
+    def update(self, event: str, data):
+        print(f"  📋 Log: {data['symbol']} {event} -> R${data['price']:.2f}")
+
+
+# ---- observer/main.py
+def observer_demo():
+    print("=== OBSERVER ===")
+    petr4 = Stock("PETR4", 35.00)
+    petr4.attach(AlertObserver("Trader A", 36.0))
+    petr4.attach(AlertObserver("Trader B", 37.0))
+    petr4.attach(LogObserver())
+
+    petr4.price = 36.50
+    petr4.price = 37.20
+    print()
+
+
+observer_demo()
+# =============================================================================
 # MEMENTO
 # =============================================================================
 #
